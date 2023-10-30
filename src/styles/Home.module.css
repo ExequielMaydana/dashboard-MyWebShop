@@ -1,0 +1,16 @@
+.main {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.contentHome {
+  width: 100%;
+  flex-grow: 1;
+}
+
+@media screen and (min-width: 976px) {
+  .contentHome {
+    margin-top: 109px;
+  }
+}
