@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 
 import {
   Box,
@@ -18,6 +18,7 @@ import Button from "@mui/material/Button";
 import { Formik, FieldArray } from "formik";
 import Image from "next/image";
 import axios from "axios";
+import ModalStatus from "@/components/modals/ModalStatus";
 
 const theme = createTheme({
   palette: {
@@ -39,18 +40,40 @@ const MenuProps = {
   },
 };
 
-const colors = ["Blanco", "Negro", "Amarillo", "Verde", "Gris"];
+const colors = [
+  "Blanco",
+  "Negro",
+  "Amarillo",
+  "Verde",
+  "Gris",
+  "Marron claro",
+  "Marron",
+  "Celeste",
+];
 const sizes = ["7", "8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5"];
+const sizesClothing = [
+  "S",
+  "M",
+  "L",
+  "XL",
+  "XXL",
+  "38",
+  "39",
+  "40",
+  "41",
+  "42",
+];
 const tags = ["Oversize", "Ropa comoda", "Casual", "Moda", "Formal"];
 
 const FormAddProduct = () => {
+  const [onModalStatus, setOnModalStatus] = useState(false);
+  const [onLoading, setOnLoading] = useState(false);
   const handleFileChange = (event, push) => {
     const files = event.target.files;
     if (files && files.length > 0) {
       const file = files[0];
       const imageURL = URL.createObjectURL(file);
       const imageObject = { file, previewURL: imageURL };
-      console.log(imageObject);
       push(imageObject);
     }
   };
@@ -85,8 +108,51 @@ const FormAddProduct = () => {
     });
   };
 
+  const handleOptionSizeAndStock = (event, push, remove, values, key) => {
+    const {
+      target: { value },
+    } = event;
+
+    const selectedValue = typeof value === "string" ? value.split(",") : value;
+    const currentValue = values || [];
+
+    const toAdd = selectedValue.filter(
+      (v) => !currentValue.some((item) => item[key] === v)
+    );
+
+    const toRemove = currentValue.filter(
+      (item) => !selectedValue.includes(item[key])
+    );
+
+    toAdd.forEach((v) => {
+      // Muestra un campo de entrada para la cantidad de stock
+      const stockInput = prompt(`Ingrese la cantidad de stock para ${v}`);
+      if (stockInput !== null) {
+        const newItem = {
+          [key]: v,
+          stock: parseInt(stockInput, 10),
+        };
+        push(newItem);
+      }
+    });
+
+    toRemove.forEach((item) => {
+      const index = currentValue.findIndex((c) => c[key] === item[key]);
+      if (index !== -1) {
+        remove(index);
+      }
+    });
+  };
+
   return (
     <>
+      {onLoading && (
+        <div className="w-full h-full fixed top-0 right-0 bottom-0 left-0 m-auto flex flex-col items-center justify-center gap-2 bg-bgOpacityTwo z-[999] text-white">
+          <span className="loader"></span>
+          <p>Espere por favor...</p>
+        </div>
+      )}
+      {onModalStatus && <ModalStatus />}
       <ThemeProvider theme={theme}>
         <Box
           sx={{
@@ -119,6 +185,7 @@ const FormAddProduct = () => {
             }}
             onSubmit={(values, { resetForm }) => {
               const formData = new FormData();
+              setOnLoading(true);
 
               for (const key in values) {
                 if (values.hasOwnProperty(key)) {
@@ -153,6 +220,14 @@ const FormAddProduct = () => {
               })
                 .then((response) => {
                   console.log(response.data);
+
+                  setOnModalStatus(true);
+                  setOnLoading(false);
+
+                  setTimeout(() => {
+                    setOnModalStatus(false);
+                  }, 3000);
+                  resetForm();
                 })
                 .catch((error) => {
                   if (axios.isCancel(error)) {
@@ -162,6 +237,7 @@ const FormAddProduct = () => {
                   } else {
                     console.error(error);
                   }
+                  setOnLoading(false);
                 });
             }}
           >
@@ -434,6 +510,9 @@ const FormAddProduct = () => {
                           <MenuItem key="pantalon" value="pantalon">
                             Pantalon
                           </MenuItem>,
+                          <MenuItem key="bermuda" value="bermuda">
+                            Bermuda
+                          </MenuItem>,
                           <MenuItem key="jeans" value="jeans">
                             Jeans
                           </MenuItem>,
@@ -541,7 +620,7 @@ const FormAddProduct = () => {
                               multiple
                               value={values.sizes.map((size) => size.size)}
                               onChange={(e) =>
-                                handleSelectOption(
+                                handleOptionSizeAndStock(
                                   e,
                                   push,
                                   remove,
@@ -553,7 +632,31 @@ const FormAddProduct = () => {
                               renderValue={(selected) => selected.join(", ")}
                               MenuProps={MenuProps}
                             >
-                              {sizes.map((name) => (
+                              {values.category === "indumentaria" &&
+                                sizesClothing.map((name) => (
+                                  <MenuItem key={name} value={name}>
+                                    <Checkbox
+                                      checked={values.sizes.some(
+                                        (sizeObj) => sizeObj.size === name
+                                      )}
+                                    />
+                                    <ListItemText primary={name} />
+                                  </MenuItem>
+                                ))}
+
+                              {values.category === "calzado" &&
+                                sizes.map((name) => (
+                                  <MenuItem key={name} value={name}>
+                                    <Checkbox
+                                      checked={values.sizes.some(
+                                        (sizeObj) => sizeObj.size === name
+                                      )}
+                                    />
+                                    <ListItemText primary={name} />
+                                  </MenuItem>
+                                ))}
+
+                              {/* {sizes.map((name) => (
                                 <MenuItem key={name} value={name}>
                                   <Checkbox
                                     checked={values.sizes.some(
@@ -562,7 +665,7 @@ const FormAddProduct = () => {
                                   />
                                   <ListItemText primary={name} />
                                 </MenuItem>
-                              ))}
+                              ))} */}
                             </Select>
                           </FormControl>
                         )}

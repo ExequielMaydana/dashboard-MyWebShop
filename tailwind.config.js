@@ -55,7 +55,7 @@ module.exports = {
     },
     backgroundColor: {
       bgOpacity: "rgba(0, 0, 0, 0.5)",
-
+      bgOpacityTwo: "rgba(0, 0, 0, .9)",
       white: "#f9fafb",
       black: "#09090b",
       aliceBlue: "#eef2ff",
