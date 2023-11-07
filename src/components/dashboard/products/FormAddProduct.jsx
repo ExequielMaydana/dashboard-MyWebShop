@@ -108,6 +108,42 @@ const FormAddProduct = () => {
     });
   };
 
+  const handleOptionSizeAndStock = (event, push, remove, values, key) => {
+    const {
+      target: { value },
+    } = event;
+
+    const selectedValue = typeof value === "string" ? value.split(",") : value;
+    const currentValue = values || [];
+
+    const toAdd = selectedValue.filter(
+      (v) => !currentValue.some((item) => item[key] === v)
+    );
+
+    const toRemove = currentValue.filter(
+      (item) => !selectedValue.includes(item[key])
+    );
+
+    toAdd.forEach((v) => {
+      // Muestra un campo de entrada para la cantidad de stock
+      const stockInput = prompt(`Ingrese la cantidad de stock para ${v}`);
+      if (stockInput !== null) {
+        const newItem = {
+          [key]: v,
+          stock: parseInt(stockInput, 10),
+        };
+        push(newItem);
+      }
+    });
+
+    toRemove.forEach((item) => {
+      const index = currentValue.findIndex((c) => c[key] === item[key]);
+      if (index !== -1) {
+        remove(index);
+      }
+    });
+  };
+
   return (
     <>
       {onLoading && (
@@ -584,7 +620,7 @@ const FormAddProduct = () => {
                               multiple
                               value={values.sizes.map((size) => size.size)}
                               onChange={(e) =>
-                                handleSelectOption(
+                                handleOptionSizeAndStock(
                                   e,
                                   push,
                                   remove,
