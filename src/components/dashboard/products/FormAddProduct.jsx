@@ -49,6 +49,9 @@ const colors = [
   "Marron claro",
   "Marron",
   "Celeste",
+  "Cremita",
+  "Rojo",
+  "Violeta",
 ];
 const sizes = ["7", "8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5"];
 const sizesClothing = [
@@ -470,12 +473,12 @@ const FormAddProduct = () => {
                       />
                       <FormControl fullWidth size="small">
                         <InputLabel id="demo-simple-select-label">
-                          categoría
+                          Categoría
                         </InputLabel>
                         <Select
                           labelId="demo-simple-select-label"
                           id="demo-simple-select"
-                          label="category"
+                          label="Categoría"
                           name="category"
                           onChange={handleChange}
                           onBlur={handleBlur}
@@ -590,7 +593,7 @@ const FormAddProduct = () => {
                                   "color"
                                 )
                               }
-                              input={<OutlinedInput label="colors" />}
+                              input={<OutlinedInput label="Colores" />}
                               renderValue={(selected) => selected.join(", ")}
                               MenuProps={MenuProps}
                             >
@@ -692,7 +695,7 @@ const FormAddProduct = () => {
                                 "tag"
                               )
                             }
-                            input={<OutlinedInput label="tags" />}
+                            input={<OutlinedInput label="Etiquetas" />}
                             renderValue={(selected) => selected.join(", ")}
                             MenuProps={MenuProps}
                           >
@@ -740,7 +743,7 @@ const FormAddProduct = () => {
                     }}
                   >
                     <TextField
-                      id="standard-basic"
+                      // id="standard-basic"
                       label="Precio regular"
                       variant="outlined"
                       size="small"
@@ -752,7 +755,7 @@ const FormAddProduct = () => {
                       fullWidth
                     />
                     <TextField
-                      id="standard-basic"
+                      // id="standard-basic"
                       label="Precio venta"
                       variant="outlined"
                       size="small"
